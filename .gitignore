@@ -1,0 +1,4 @@
+Logs/*.log
+db/example.db
+
+.DS_Store
