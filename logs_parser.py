@@ -1,9 +1,11 @@
 from os import listdir
 from os.path import isfile, join
+import time
 import sqlite3
 import re
 
-db_path = './db/example.db';
+start_time = time.time()
+db_path = f"""./db/try_{int(start_time)}.db""";
 
 print(f"""Connecting to \"{db_path}\" sqlite database...""")
 # Connecting to db
@@ -70,7 +72,7 @@ for file_name in only_files:
         splitted_line = line.strip().split(' ')
 
         date = splitted_line[0]
-        time = splitted_line[1]
+        timestamp = splitted_line[1]
         ip = splitted_line[2]
         login = splitted_line[3]
         host = splitted_line[4]
@@ -103,7 +105,7 @@ for file_name in only_files:
 
         # Insert data into db
         cur.execute(f'''INSERT INTO web_requests VALUES (
-                        \'{str(date) + 'T' + str(time)}\',
+                        \'{str(date) + 'T' + str(timestamp)}\',
                         \'{str(ip)}\',
                         \'{str(login)}\',
                         \'{str(host)}\',
@@ -118,5 +120,7 @@ for file_name in only_files:
 
 # Close db connection
 con.close()
-print("Connection closed...")
+print("Connection closed.")
 
+processing_time = int(time.time() - start_time)
+print(f"""Processing took {processing_time} seconds.""")

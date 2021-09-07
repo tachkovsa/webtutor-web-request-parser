@@ -1,4 +1,4 @@
 Logs/*.log
-db/example.db
+db/*.db
 
 .DS_Store
