@@ -3,9 +3,17 @@ from os.path import isfile, join
 import sqlite3
 import re
 
+db_path = './db/example.db';
+
+print(f"""Connecting to \"{db_path}\" sqlite database...""")
 # Connecting to db
-con = sqlite3.connect('./db/example.db')
-cur = con.cursor()
+try:
+    con = sqlite3.connect(db_path)
+    cur = con.cursor()
+    print("Connection established")
+except Exception as e:
+    print("Connection failed cause: " + e)
+    exit()
 
 # Delete table if exists
 cur.execute('''DROP TABLE IF EXISTS web_requests;''')
@@ -24,10 +32,24 @@ cur.execute('''CREATE TABLE IF NOT EXISTS web_requests (
                 );''')
 
 logs_path = './Logs'
-only_files = [f for f in listdir(logs_path) if isfile(join(logs_path, f))]
+print(f"""Looking for log files in \"{logs_path}\" directory""")
 
-for file_name in only_files:    
+log_files_count = 0
+try:
+    only_files = [f for f in listdir(logs_path) if isfile(join(logs_path, f))]
+    log_files_count = len(only_files)
+
+    print(f"""{log_files_count} log files was found""")
+except Exception as e:
+    print("Something went wrong while reading directory:" + e)
+    exit()
+
+cur_file_index = 0
+for file_name in only_files:
     count = 0
+    cur_file_index += 1
+
+    print(f"""Processing {cur_file_index} of {log_files_count} files...""")
 
     # Construct file path
     file_path = f'''./Logs/{file_name}'''
@@ -36,7 +58,8 @@ for file_name in only_files:
     try:
         log_file = open(file_path, 'r')
         Lines = log_file.readlines()
-    except:
+    except Exception as e:
+        print(f"""Unable to open file \"{file_path}\" cause: {e}""")
         continue
 
     for line in Lines:
@@ -95,4 +118,5 @@ for file_name in only_files:
 
 # Close db connection
 con.close()
+print("Connection closed...")
 
