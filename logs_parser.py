@@ -11,8 +11,7 @@ cur = con.cursor()
 cur.execute('''DROP TABLE IF EXISTS web_requests;''')
 # Create table if not exists
 cur.execute('''CREATE TABLE IF NOT EXISTS web_requests (
-                   date text,
-                   time text,
+                   timestamp datetime,
                    ip text,
                    login text,
                    host text,
@@ -20,8 +19,8 @@ cur.execute('''CREATE TABLE IF NOT EXISTS web_requests (
                    url text,
                    user_agent text,
                    mode text,
-                   object_id text,
-                   doc_id text
+                   object_id bigint,
+                   doc_id bigint
                 );''')
 
 logs_path = './Logs'
@@ -61,28 +60,27 @@ for file_name in only_files:
         # Find mode
         re_mode = re.search("mode=([a-zA-Z_]*)|_wt\/([a-zA-Z_]*)", url)
         if re_mode:
-            mode = re_mode[1] or re_mode[2] or ""
+            mode = re_mode[1] or re_mode[2] or "NULL"
         else:
-            mode = ""
+            mode = "NULL"
 
         # Find object_id
         re_object_id = re.search("object_id=(\d*)|_wt\/[a-zA-Z_]*\/(\d*)|_wt\/(\d*)", url)
         if re_object_id:
-            object_id = re_object_id[1] or re_object_id[2] or re_object_id[3] or ""
+            object_id = re_object_id[1] or re_object_id[2] or re_object_id[3] or "NULL"
         else:
-            object_id = ""
+            object_id = "NULL"
 
         # Find doc_id
         re_doc_id = re.search("doc_id=(\d*)|doc_id\/(\d*)", url)
         if re_doc_id:
-            doc_id = re_doc_id[1] or re_doc_id[2] or ""
+            doc_id = re_doc_id[1] or re_doc_id[2] or "NULL"
         else:
-            doc_id = ""
+            doc_id = "NULL"
 
         # Insert data into db
         cur.execute(f'''INSERT INTO web_requests VALUES (
-                        \'{str(date)}\',
-                        \'{str(time)}\',
+                        \'{str(date) + 'T' + str(time)}\',
                         \'{str(ip)}\',
                         \'{str(login)}\',
                         \'{str(host)}\',
@@ -90,8 +88,8 @@ for file_name in only_files:
                         \'{str(url)}\',
                         \'{str(user_agent)}\',
                         \'{str(mode)}\',
-                        \'{str(object_id)}\',
-                        \'{str(doc_id)}\'
+                        {object_id},
+                        {doc_id}
                         );''')
         con.commit()
 
