@@ -66,9 +66,9 @@ for file_name in only_files:
 
     for line in Lines:
         count += 1
-        if count < 5:
+        if line[0][:1] == "#":
             continue
-
+        
         splitted_line = line.strip().split(' ')
 
         date = splitted_line[0]
