@@ -1,4 +1,6 @@
 Logs/*.log
 db/*.db
+config.ini
+venv
 
 .DS_Store
